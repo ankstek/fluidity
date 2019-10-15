@@ -4,7 +4,10 @@ namespace Fluidity.Core
 {
     public class MotionEngine
     {
-        static void Main(String[] args) 
+        int y = 6;
+        int x = 6;
+
+        static void Main(String[] args)
         {
             Console.WriteLine("Hello World!");
             Console.WriteLine("Press any key to exit.");
@@ -14,7 +17,8 @@ namespace Fluidity.Core
         public void run()
         {
             MotionEngine fluidty = new MotionEngine();
-            float[,] from = new float[6, 6];
+
+            double[,] from = new double[x, y];
             int i = 0;
             int j = 0;
             Random random = new Random();
@@ -33,13 +37,13 @@ namespace Fluidity.Core
             Console.ReadKey();
         }
 
-        private void threeBy3avg(int passes, float[,] from)
+        private void threeBy3avg(int passes, double[,] from)
         {
             if (passes == 0)
             {
                 return;
             }
-            int[,] to = new int[from.GetLength(0), from.GetLength(1)];
+            double[,] to = new double[from.GetLength(0), from.GetLength(1)];
 
             int k = 0;
             int i = 0;
@@ -59,45 +63,46 @@ namespace Fluidity.Core
             threeBy3avg(passes--, to);
         }
 
-        private float avgNeighbour(int[,] from, int x, int y)
+        private double avgNeighbour(double[,] from, int x, int y)
         {
-            int readonly lengthX = from.GetLength(0) - 1;
+            int lengthX = from.GetLength(0) - 1;
             int lengthY = from.GetLength(1) - 1;
 
-            int denominator = 0;
-            int numerator = 0;
+            double denominator = 0;
+            double numerator = 0;
 
-            switch (x)
+            if (x == 0)
             {
-                case 0:
-                    numerator += from[x + 1, y];
-                    denominator++;
-                    break;
-                case (lengthX):
-                    numerator += from[x - 1, y];
-                    denominator++;
-                    break;
-                default:
-                    numerator += from[x + 1, y];
-                    numerator += from[x - 1, y];
-                    denominator += 2;
-                    break;
+                numerator += from[x + 1, y];
+                denominator++;
             }
-            switch (y)
+            else if (x == lengthX - 1)
             {
-                case 0:
-                    numerator += from[x, y + 1];
-                    denominator++;
-                    break;
-                case (lengthY - 1):
-                    numerator += from[x, y - 1];
-                    denominator++;
-                    break;
-                default:
-                    numerator += from[x, y + 1];
-                    numerator += from[x, y - 1];
-                    denominator += 2;
-                    break;
+                numerator += from[x - 1, y];
+                denominator++;
+            }
+            else
+            {
+                numerator += from[x + 1, y];
+                numerator += from[x - 1, y];
+                denominator += 2;
+            }
+
+            if (y == 0)
+            {
+                numerator += from[x, y + 1];
+                denominator++;
+            }
+            else if (y == lengthY - 1)
+            {
+                numerator += from[x, y - 1];
+                denominator++;
+            }
+            else
+            {
+                numerator += from[x, y + 1];
+                numerator += from[x, y - 1];
+                denominator += 2;
             }
 
             if (denominator != 0)
@@ -112,12 +117,13 @@ namespace Fluidity.Core
             //Manage ticks, setup game world etc.
         }
 
-        private float Update()
+        private void Update()
         {
             //Tick once
         }
 
-        public void init() {
+        public void init()
+        {
 
             //read materials list
         }

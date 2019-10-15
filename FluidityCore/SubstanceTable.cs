@@ -1,4 +1,5 @@
-using DataContractJsonSerializer;
+using System.Runtime.Serialization;
+using System.Collections.Generic;
 using System;
 
 namespace Fluidity.Core
@@ -7,66 +8,60 @@ namespace Fluidity.Core
     public enum State {GAS, LIQUID, SOLID};
 
     [DataContract]
-    internal class Substance
+    struct Substance
     {
         [DataMember]
-        int substanceId;
+        public int substanceId;
         [DataMember]
-        string nameGas;
+        public string nameGas;
         [DataMember]
-        string nameLiquid;
+        public string nameLiquid;
         [DataMember]
-        string nameSolid;
+        public string nameSolid;
         [DataMember]
-        float boilingPoint;
+        public double boilingPoint;
         [DataMember]
-        float meltingPoint;
+        public double meltingPoint;
         [DataMember]
-        float molarMass;
+        public double molarMass;
         [DataMember]
-        float heatCapacityGas;
+        public double heatCapacityGas;
         [DataMember]
-        float heatCapacityLiquid;
+        public double heatCapacityLiquid;
         [DataMember]
-        float heatCapacitySolid;
+        public double heatCapacitySolid;
         [DataMember]
-        float thermalConductivityGas;
+        public double thermalConductivityGas;
         [DataMember]
-        float thermalConductivityLiquid;
+        public double thermalConductivityLiquid;
         [DataMember]
-        float thermalConductivitySolid;
+        public double thermalConductivitySolid;
         [DataMember]
-        float infraredAbsorptionGas;
+        public double infraredAbsorptionGas;
         [DataMember]
-        float infraredAbsorptionLiquid;
+        public double infraredAbsorptionLiquid;
         [DataMember]
-        float infraredAbsorptionSolid;
+        public double infraredAbsorptionSolid;
         [DataMember]
-        float frictionCoeficientGas;
+        public double frictionCoeficientGas;
         [DataMember]
-        float frictionCoeficientLiquid;
+        public double frictionCoeficientLiquid;
         [DataMember]
-        float frictionCoeficientSolid;
+        public double frictionCoeficientSolid;
         [DataMember]
-        float blackBodyFactorGas;
+        public double blackBodyFactorGas;
         [DataMember]
-        float blackBodyFactorLiquid;
+        public double blackBodyFactorLiquid;
         [DataMember]
-        float blackBodyFactorSolid;
+        public double blackBodyFactorSolid;
         [DataMember]
-        float latentHeatVaporizing;
+        public double latentHeatVaporizing;
         [DataMember]
-        float latentHeatMelting;
+        public double latentHeatMelting;
         [DataMember]
-        float breakingStrenght;
+        public double breakingStrenght;
 
-        public Substance()
-        {
-
-        }
-        
-        public int getSubstanceId()
-        {
+        public int getSubstanceId() {
             return substanceId;
         }
     }
@@ -76,32 +71,17 @@ namespace Fluidity.Core
     {
         private SubstanceTable substanceTable;
         int MAX_SUBSTANCES = 1024;
-        Substance[] substances = new Substance[MAX_SUBSTANCES];
+        Substance[] substances;
 
         public SubstanceTable(List<Substance> substanceList)
         {
-            if (substanceList.lenght <= MAX_SUBSTANCES) {
+            substances = new Substance[MAX_SUBSTANCES];
+            if (substanceList.Count <= MAX_SUBSTANCES) {
                 foreach (Substance substance in substanceList) {
-                    substances[substance.getSubstanceId] = substance;
+                    substances[substance.getSubstanceId()] = substance;
                 }
             }
             //TODO: read JSON or other data
-        }
-
-        public static void setInstance(SubstanceTable instance)
-        {
-            substanceTable = instance;
-        }
-
-        public static SubstanceTable getInstance()
-        {
-            if (SubstanceTable != null)
-            {
-                return substanceTable;
-            } else
-            {
-                Console.WriteLine("Error! SubstanceTable not initialized!");
-            }
         }
 
         public string getName(State state, int substanceId)
@@ -115,7 +95,7 @@ namespace Fluidity.Core
             }
         }
 
-        public float getHeatcapacity(State state, int substanceId)
+        public double getHeatcapacity(State state, int substanceId)
         {
             switch (state)
             {
@@ -126,7 +106,7 @@ namespace Fluidity.Core
             }
         }
 
-        public float getthermalConductivity(State state, int substanceId)
+        public double getthermalConductivity(State state, int substanceId)
         {
             switch (state)
             {
@@ -137,7 +117,7 @@ namespace Fluidity.Core
             }
         }
 
-        public float getinfraredAbsorption(State state, int substanceId)
+        public double getinfraredAbsorption(State state, int substanceId)
         {
             switch (state)
             {
@@ -148,7 +128,7 @@ namespace Fluidity.Core
             }
         }
 
-        public float getfrictionCoeficient(State state, int substanceId)
+        public double getfrictionCoeficient(State state, int substanceId)
         {
             switch (state)
             {
@@ -159,7 +139,7 @@ namespace Fluidity.Core
             }
         }
 
-        public float getblackBodyFactor(State state, int substanceId)
+        public double getblackBodyFactor(State state, int substanceId)
         {
             switch (state)
             {
@@ -170,7 +150,7 @@ namespace Fluidity.Core
             }
         }
 
-        public float getLatentHeat(State state, int substanceId)
+        public double getLatentHeat(State state, int substanceId)
         {
             switch (state)
             {
@@ -180,19 +160,19 @@ namespace Fluidity.Core
             }
         }
 
-        public float getBoilingPointK(int substanceId)
+        public double getBoilingPointK(int substanceId)
         {
             return substances[substanceId].boilingPoint;
         }
 
-        public float getMeltingPointK(int substanceId)
+        public double getMeltingPointK(int substanceId)
         {
             return substances[substanceId].meltingPoint;
         }
 
-        public float getMolarMass(int substanceId)
+        public double getMolarMass(int substanceId)
         {
-            return molarMass;
+            return substances[substanceId].molarMass;
         }
     }
 }

@@ -1,14 +1,14 @@
-﻿using Math;
+﻿using System;
 namespace Fluidity.Core
 {
     enum TemperatureScale {KELVIN, CELSIUS, FARENHEIT };
 
     class Tools
     {
-        public static readonly float GAS_CONSTANT = 8.31446261815324;
-        public static readonly float R_THROUGH_CV = 1.31950791077289; //precalculated for when volume is halved
+        public static readonly double GAS_CONSTANT = 8.31446261815324;
+        public static readonly double R_THROUGH_CV = 1.31950791077289; //precalculated for when volume is halved
 
-        public static float getDisplayTemperature(float temperatureK, TemperatureScale playerTempScale)
+        public static double getDisplayTemperature(double temperatureK, TemperatureScale playerTempScale)
         {
             switch (playerTempScale)
             {
@@ -23,18 +23,18 @@ namespace Fluidity.Core
          * This is simplified to the ideal gas law, this is because having each individual gas real compressability
          * would be a nightmare, and I consider this close enough
          */
-        public static float getPressure(int substanceId, float temperatureK, float mass, int subtileResolution) {
+        public static double getPressure(int substanceId, double temperatureK, double mass, int subtileResolution) {
             //joule / kubicmeter
             return getAmount(substanceId, mass) * GAS_CONSTANT * temperatureK / getSubtileVolume(subtileResolution);
         }
 
-        public static float getFriction(int substanceId)
+        public static double getFriction(int substanceId)
         {
             //TODO
             return 0;
         }
 
-        public static float getSubtileArea(int subtileResolution) {
+        public static double getSubtileArea(int subtileResolution) {
             switch (subtileResolution)
             {
                 case 1: return 4;
@@ -45,7 +45,7 @@ namespace Fluidity.Core
             }
         }
 
-        public static float getSubtileVolume(int subtileResolution) {
+        public static double getSubtileVolume(int subtileResolution) {
             //subtileResolution is 1,2,4 or 8. I don't think it should go any higher but the option is there...
             //kubic meter
             switch (subtileResolution)
@@ -59,67 +59,67 @@ namespace Fluidity.Core
             }
         }
 
-        public static float getSubstanceMixTemperature(int substanceId, float mass1, float mass2, float temperature1, float temperature2) 
+        public static double getSubstanceMixTemperature(int substanceId, double mass1, double mass2, double temperature1, double temperature2) 
         {
-            float n1 = getAmount(substanceId, mass1);
-            float n2 = getAmount(substanceId, mass2);
+            double n1 = getAmount(substanceId, mass1);
+            double n2 = getAmount(substanceId, mass2);
             return (n1 * temperature1) + (n2 * temperature2) / (n1 + n2);
         }
 
-        public static float getSubstanceMixPressure(float substanceDensity, int subtileResolution, float mass1, float mass2, float temperature1, float temperature2)
+        public static double getSubstanceMixPressure(double substanceDensity, int subtileResolution, double mass1, double mass2, double temperature1, double temperature2)
         {
-            float n1 = getAmount(substanceDensity, mass1);
-            float n2 = getAmount(substanceDensity, mass2);
+            double n1 = getAmount(substanceDensity, mass1);
+            double n2 = getAmount(substanceDensity, mass2);
             return GAS_CONSTANT * ((n1 * temperature1) + (n2 * temperature2)) / (2 * getSubtileVolume(subtileResolution));
         }
 
-        public static float getCompressedTemperature(float temperature)
+        public static double getCompressedTemperature(double temperature)
         {
             return R_THROUGH_CV * temperature;
         }
 
-        public static float getCompressedPressure(float pressure)
+        public static double getCompressedPressure(double pressure)
         {
             return pressure * 2 * R_THROUGH_CV;
         }
 
-        public static float getExpandedTemperature(float temperature)
+        public static double getExpandedTemperature(double temperature)
         {
             //TODO
             return temperature;
         }
 
-        public static float getExpandedPressure(float pressure)
+        public static double getExpandedPressure(double pressure)
         {
             //TODO
             return pressure;
         }
 
-        public static float getAmount(float substanceDensity, float mass) {
+        public static double getAmount(double substanceDensity, double mass) {
             return (mass * 1000) / substanceDensity;
         }
 
-        public static float getSpecificBlackbodyRadiation(float temperatureK, float subtileArea, float blackbodyFactor) {
+        public static double getSpecificBlackbodyRadiation(double temperatureK, double subtileArea, double blackbodyFactor) {
             return getGetBlackbodyRadiation(temperatureK, subtileArea) * blackbodyFactor;
         }
 
-        public static float getGetBlackbodyRadiation(float temperatureK, float subtileArea)
+        public static double getGetBlackbodyRadiation(double temperatureK, double subtileArea)
         {
             return Math.Pow(temperatureK, 4) * (5.67 / 10000000) * subtileArea;
         }
 
-        public float getLatentHeat(int substanceId, float mass) {
+        public double getLatentHeat(int substanceId, double mass) {
             //TODO
             return 0.0;
         }
 
-        public static float getVaporPressure()
+        public static double getVaporPressure()
         {
             //TODO
             return 0.0;
         }
 
-        public static float getTemperatureDelta(float mass, float specificHeatCapacity, float thermalEnergy)
+        public static double getTemperatureDelta(double mass, double specificHeatCapacity, double thermalEnergy)
         {
             return thermalEnergy / (specificHeatCapacity * mass); 
         }

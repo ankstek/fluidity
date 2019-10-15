@@ -1,51 +1,58 @@
 namespace Fluidity.Core
 {
 
-    enum Direction { UP, DOWN, LEFT, RIGHT };
+    public enum Direction { UP, DOWN, LEFT, RIGHT };
 
     struct Action
     {
-        int priority = 0; //0-255 low to high
+        int priority; //0-255 low to high
     }
 
-    struct Subtile
+    public struct Subtile
     {
-        float currentMass = 0;
-        float currentPressure = 0;
-        float currentTemperature = 0;
-        int substanceId;
-        State state;
-        int priority;
-        float momentumForceX = 0;
-        Direction momentumDirectionX;
-        float momentumForceY = 0;
-        Direction momentumDirectionY;
+        public double currentMass;
+        public double currentPressure;
+        public double currentTemperature;
+        public int substanceId;
+        public State state;
+        public int priority;
+        public double momentumForceX;
+        public Direction momentumDirectionX;
+        public double momentumForceY;
+        public Direction momentumDirectionY;
 
-        public Subtile(int substanceId, State state, float currentMass, float currentPressure, float currentTemperature)
+        public Subtile(int substanceId, State state, double currentMass, double currentPressure, double currentTemperature)
         {
             this.substanceId = substanceId;
             this.state = state;
             this.currentMass = currentMass;
             this.currentPressure = currentPressure;
             this.currentTemperature = currentTemperature;
+            priority = 0;
+            momentumDirectionX = Direction.UP;
+            momentumDirectionY = Direction.UP;
+            momentumForceX = 0;
+            momentumForceY = 0;
         }
     }
 
     public class Tile
     {
         Subtile[,] subtiles;
-        Subtile swapTile = new Subtile();
-        int subtileResolution = 1;
-        int MAPSIZE_X = 0;
-        int MAPSIZE_Y = 0;
-        int TILE_X = 0;
-        int TILE_Y = 0;
-        readonly bool edgeTile = false;
+        public readonly int subtileResolution = 1;
+        public int MAPSIZE_X = 0;
+        public int MAPSIZE_Y = 0;
+        public int TILE_X = 0;
+        public int TILE_Y = 0;
+        public readonly bool edgeTile = false;
 
-        public Tile(int subtileResolution, int map_x, int map_y, int tile_x, int tile_y)
+        Map map;
+
+        public Tile(int subtileResolution, int map_x, int map_y, int tile_x, int tile_y, Map map)
         {
             subtiles = new Subtile[subtileResolution, subtileResolution];
             this.subtileResolution = subtileResolution;
+            this.map = map;
             MAPSIZE_X = map_x;
             MAPSIZE_Y = map_y;
             TILE_X = tile_x;
@@ -56,26 +63,27 @@ namespace Fluidity.Core
             }
         }
 
-        public static Subtile getSubtile(int x, int y)
+        public Subtile getSubtile(int x, int y)
         {
-            return subtiles[x, y];
+            return this.subtiles[x, y];
         }
 
         public static void swapSubTiles(Subtile subtile1, Subtile subtile2)
         {
-            swapTile = subtile1;
+            Subtile swapTile = subtile1;
             subtile1 = subtile2;
             subtile2 = swapTile;
         }
 
-        public float getSubtileForce(int x, int y, Direction direction)
+        public double getSubtileForce(int x, int y, Direction direction)
         {
 
             switch (subtiles[x, y].state)
             {
-                case State.GAS: subtile[x, y]; break;
-                case State.LIQUID: break;
-                case State.SOLID: return 0.0;
+                case State.GAS: return 0;
+                case State.LIQUID: return 0;
+                case State.SOLID: return 0;
+                default: return 0;
             }
 
         }
@@ -95,21 +103,21 @@ namespace Fluidity.Core
 
         public void equalizePressure(int x1, int y1, int x2, int y2)
         {
-            float newPressure = Tools.getSubstanceMixPressure(subtiles[x1, y1].substanceId, subtileResolution, subtiles[x1, y1].currentMass, subtiles[x2, y2].currentMass, subtiles[x1, y1].currentTemperature, subtiles[x2, y2].currentTemperature);
+            double newPressure = Tools.getSubstanceMixPressure(subtiles[x1, y1].substanceId, subtileResolution, subtiles[x1, y1].currentMass, subtiles[x2, y2].currentMass, subtiles[x1, y1].currentTemperature, subtiles[x2, y2].currentTemperature);
             subtiles[x1, y1].currentPressure = newPressure;
             subtiles[x2, y2].currentPressure = newPressure;
         }
 
         public void equalizeTemperature(int x1, int y1, int x2, int y2)
         {
-            float newTemp = Tools.getSubstanceMixTemperature(subtiles[x1, y1].substanceId, subtiles[x1, y1].currentMass, subtiles[x2, y2].currentMass, subtiles[x1, y1].currentTemperature, subtiles[x2, y2].currentTemperature);
+            double newTemp = Tools.getSubstanceMixTemperature(subtiles[x1, y1].substanceId, subtiles[x1, y1].currentMass, subtiles[x2, y2].currentMass, subtiles[x1, y1].currentTemperature, subtiles[x2, y2].currentTemperature);
             subtiles[x1, y1].currentTemperature = newTemp;
             subtiles[x2, y2].currentTemperature = newTemp;
         }
 
         public void equalizeMass(int x1, int y1, int x2, int y2)
         {
-            float newMass = (subtiles[x1, y1].currentMass + subtiles[x2, y2].currentMass) / 2;
+            double newMass = (subtiles[x1, y1].currentMass + subtiles[x2, y2].currentMass) / 2;
             subtiles[x1, y1].currentMass = newMass;
             subtiles[x2, y2].currentMass = newMass;
         }
@@ -119,7 +127,7 @@ namespace Fluidity.Core
 
         }
 
-        public void updateTemperature(int x, int y, float newTemperature)
+        public void updateTemperature(int x, int y, double newTemperature)
         {
 
         }
@@ -131,7 +139,7 @@ namespace Fluidity.Core
 
         public void moveSubtile(int x, int y, Direction direction)
         {
-            subtiles[x, y];
+
         }
 
         public void subtileAction(int x, int y)
@@ -142,7 +150,7 @@ namespace Fluidity.Core
 
         public void entropyHeat(int x, int y)
         {
-            if (currentTemperature > 0.1)
+            if (subtiles[x, y].currentTemperature > 0.1)
             {
                 conductHeat(x, y);
                 if (subtiles[x, y].currentTemperature > 325) //at temperatures greater than 50, start trying to radiate heat away
@@ -154,59 +162,68 @@ namespace Fluidity.Core
 
         public void conductHeat(int x, int y)
         {
+            int length_x = subtiles.GetLength(0);
+            int length_y = subtiles.GetLength(1);
+            double rightTemp = -1;
+            double upTemp = -1;
+            double leftTemp = -1;
+            double downTemp = -1;
 
-            float rightTemp = -1;
-            float upTemp = -1;
-            float leftTemp = -1;
-            float downTemp = -1;
 
-            switch (x)
+
+            if (x == 0)
             {
-                case 0:
-                    if (!edgeTile)
-                    {
-                        leftTemp = Map.getTile(TILE_X, TILE_Y).getSubtile(subtileResolution - 1, y);
-                    }
-                    rightTemp = subtiles[x + 1, y].currentTemperature;
-                    break;
-                case subtileResolution - 1:
-                    if (!edgeTile)
-                    {
-                        rightTemp = Map.getTile(TILE_X, TILE_Y).getSubtile(0, y);
-                    }
-                    leftTemp = subtiles[x - 1, y].currentTemperature;
-                    break;
-                default:
-                    rightTemp = subtiles[x + 1, y].currentTemperature;
-                    leftTemp = subtiles[x - 1, y].currentTemperature;
-                    break;
+                if (!edgeTile)
+                {
+                    leftTemp = map.getTile(TILE_X - 1, TILE_Y).getSubtile(subtileResolution - 1, y).currentTemperature;
+                }
+                rightTemp = subtiles[x + 1, y].currentTemperature;
             }
-            switch (y)
+            else if (x == length_x - 1)
             {
-                case 0:
-                    if (!edgeTile)
-                    {
-                        upTemp = Map.getTile(TILE_X, TILE_Y).getSubtile(x, subtileResolution - 1);
-                    }
-                    downTemp = subtiles[x, y + 1].currentTemperature;
-                    break;
-                case subtileResolution - 1:
-                    if (!edgeTile)
-                    {
-                        downTemp = Map.getTile(TILE_X, TILE_Y).getSubtile(x, 0);
-                    }
-                    upTemp = subtiles[x, y - 1].currentTemperature;
-                    break;
-                default:
-                    upTemp = subtiles[x, y - 1].currentTemperature;
-                    downTemp = subtiles[x, y + 1].currentTemperature;
-                    break;
+                if (!edgeTile)
+                {
+                    rightTemp = map.getTile(TILE_X + 1, TILE_Y).getSubtile(0, y).currentTemperature;
+                }
+                leftTemp = subtiles[x - 1, y].currentTemperature;
+
             }
-           
-       
+            else
+            {
+                rightTemp = subtiles[x + 1, y].currentTemperature;
+                leftTemp = subtiles[x - 1, y].currentTemperature;
+            }
+
+            if (y == 0)
+            {
+                if (!edgeTile)
+                {
+                    upTemp = map.getTile(TILE_X, TILE_Y - 1).getSubtile(x, subtileResolution - 1).currentTemperature;
+                }
+                downTemp = subtiles[x + 1, y].currentTemperature;
+            }
+            else if (y == length_y)
+            {
+                if (!edgeTile)
+                {
+                    downTemp = map.getTile(TILE_X, TILE_Y + 1).getSubtile(x, 0).currentTemperature;
+                }
+                upTemp = subtiles[x - 1, y].currentTemperature;
+            }
+            else
+            {
+                upTemp = subtiles[x, y - 1].currentTemperature;
+                downTemp = subtiles[x, y + 1].currentTemperature;
+            }
+
         }
 
         public void radiateHeat(int x, int y)
+        {
+
+        }
+
+        public void reachEqulibrium(int x, int y)
         {
 
         }

@@ -1,4 +1,4 @@
-using List;
+using System.Collections.Generic;
 namespace Fluidity.Core
 {
     public class Map
@@ -6,18 +6,18 @@ namespace Fluidity.Core
 
         int SIZE_X;
         int SIZE_Y;
-        int[,] mapTiles;
+        public Tile[,] mapTiles;
 
         public Map(int x, int y, List<Tile> tiles){
             SIZE_X = x;
             SIZE_Y = y;
-            mapTiles = new mapTiles[x, y];
+            mapTiles = new Tile[x, y];
             foreach (Tile tile in tiles){
-                mapTiles[tile.x, tile.y] = tile;
+                mapTiles[tile.TILE_X, tile.TILE_X] = tile;
             }
         }
 
-        public static getTile(int x, int y)
+        public Tile getTile(int x, int y)
         {
             return mapTiles[x, y];
         }
