@@ -19,97 +19,71 @@ namespace Fluidity.Core
             MotionEngine fluidty = new MotionEngine();
 
             double[,] from = new double[x, y];
-            int i = 0;
-            int j = 0;
+
             Random random = new Random();
-            for (j = 0; j < y; j++)
-            {
-                for (i = 0; i < x; i++)
-                {
+            for (int j = 0; j < y; j++)
+                for (int i = 0; i < x; i++)
                     from[i, j] = random.Next(0, 9);
-                    Console.Write(from[i, j]);
-                }
-                Console.WriteLine();
-            }
-            fluidty.threeBy3avg(1, from);
+
+            Console.WriteLine("Before:");
+            PrintArrayGrid(from);
+            double[,] to = fluidty.MeanL1Filter(1, from);
+            Console.WriteLine("After:");
+            PrintArrayGrid(to);
+
             // Keep the console window open in debug mode.
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
         }
 
-        private void threeBy3avg(int passes, double[,] from)
+        /// <summary>
+        ///   Filter the given array <paramref name="passes"/> number of times
+        ///   with an L1 norm arithmetic mean filter.
+        /// </summary>
+        private double[,] MeanL1Filter(int passes, double[,] from)
         {
-            if (passes == 0)
-            {
-                return;
-            }
             double[,] to = new double[from.GetLength(0), from.GetLength(1)];
 
-            int k = 0;
-            int i = 0;
-            int j = 0;
-            for (k = 0; k < passes; k++)
-            {
-                for (j = 0; j < y; j++)
-                {
-                    for (i = 0; i < x; i++)
-                    {
-                        to[i, j] = avgNeighbour(from, i, j);
-                        Console.Write(to[i, j]);
-                    }
-                    Console.WriteLine();
-                }
-            }
-            threeBy3avg(passes--, to);
+            for (int k = 0; k < passes; k++)
+                for (int j = 0; j < y; j++)
+                    for (int i = 0; i < x; i++)
+                        to[i, j] = MeanL1Neighbour(from, i, j);
+
+            return to;
         }
 
-        private double avgNeighbour(double[,] from, int x, int y)
+        /// <summary>
+        ///   Compute the arithmetic mean of the neighbours in the L1 norm
+        ///   (Manhattan distance = 1).
+        /// </summary>
+        private static double MeanL1Neighbour(double[,] from, int x, int y)
         {
-            int lengthX = from.GetLength(0) - 1;
-            int lengthY = from.GetLength(1) - 1;
+            int xmin = Math.Max(0, x-1);
+            int xmax = Math.Min(from.GetLength(0) - 1, x+1);
+            int ymin = Math.Max(0, y-1);
+            int ymax = Math.Min(from.GetLength(1) - 1, y+1);
 
-            double denominator = 0;
             double numerator = 0;
+            for (int i = xmin; i <= xmax; i++)
+                numerator += from[i, y];
+            for (int i = ymin; i <= ymax; i++)
+                numerator += from[x, i];
 
-            if (x == 0)
-            {
-                numerator += from[x + 1, y];
-                denominator++;
-            }
-            else if (x == lengthX - 1)
-            {
-                numerator += from[x - 1, y];
-                denominator++;
-            }
-            else
-            {
-                numerator += from[x + 1, y];
-                numerator += from[x - 1, y];
-                denominator += 2;
-            }
+            // Subtract (x, y) twice because it is being counted by the
+            // iterations above and it shouldn't be.
+            numerator -= 2 * from[x, y];
+            double denominator = xmax - xmin + ymax - ymin;
+            return numerator / denominator;
+        }
 
-            if (y == 0)
+        private static void PrintArrayGrid(double[,] arr)
+        {
+            for (int y = 0; y < arr.GetLength(1); y++)
             {
-                numerator += from[x, y + 1];
-                denominator++;
+                for (int x = 0; x < arr.GetLength(0); x++)
+                    Console.Write($"{arr[x, y],8:F3}");
+                Console.WriteLine("");
             }
-            else if (y == lengthY - 1)
-            {
-                numerator += from[x, y - 1];
-                denominator++;
-            }
-            else
-            {
-                numerator += from[x, y + 1];
-                numerator += from[x, y - 1];
-                denominator += 2;
-            }
-
-            if (denominator != 0)
-            {
-                return (numerator / denominator);
-            }
-            return -1;
         }
 
         public void Run()
