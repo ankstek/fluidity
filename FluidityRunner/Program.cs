@@ -7,6 +7,7 @@ namespace Fluidity.Runner
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
+            new Core.MotionEngine().run();
         }
     }
 }
